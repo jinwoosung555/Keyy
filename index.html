@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ken Hub - Key System</title>
+    <style>
+        body {
+            background-color: #0f0f12;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #16161a;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            text-align: center;
+            width: 350px;
+        }
+        h2 { color: #8a2be2; margin-bottom: 10px; }
+        p { color: #a0a0a5; font-size: 14px; margin-bottom: 25px; }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .btn-discord { background-color: #5865F2; color: white; }
+        .btn-key { background-color: #2ecc71; color: white; pointer-events: none; opacity: 0.5; }
+        .btn-key.active { pointer-events: auto; opacity: 1; }
+        input {
+            width: 90%;
+            padding: 10px;
+            background: #0f0f12;
+            border: 1px solid #282830;
+            color: white;
+            border-radius: 6px;
+            text-align: center;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Ken Hub Key System</h2>
+        <p>Complete steps below to unlock your 24-hour free key.</p>
+        
+        <a href="https://discord.gg/f8WZ6yJxRD" target="_blank" class="btn btn-discord" id="discordBtn" onclick="unlockKey()">1. Join Discord Server</a>
+        <button class="btn btn-key" id="keyBtn" onclick="generateKey()">2. Claim 24h Free Key</button>
+        
+        <input type="text" id="keyOutput" readonly placeholder="Your key will appear here">
+    </div>
+
+    <script>
+        function unlockKey() {
+            setTimeout(() => {
+                const keyBtn = document.getElementById('keyBtn');
+                keyBtn.classList.add('active');
+            }, 1000);
+        }
+
+        function generateKey() {
+            const randomString = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
+            const token = "KENHUB-" + randomString.toUpperCase() + "-24H";
+            document.getElementById('keyOutput').value = token;
+        }
+    </script>
+</body>
+</html>
