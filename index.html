@@ -1,441 +1,516 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ken Hub — Secure Key System</title>
-    <style>
-        :root {
-            --bg-color: #08080a;
-            --card-bg: rgba(14, 14, 18, 0.85);
-            --border-color: rgba(255, 255, 255, 0.08);
-            --accent-color: #e53935;
-            --text-primary: #ffffff;
-            --text-secondary: #9e9ea6;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ken Hub - Key System</title>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, Helvetica, sans-serif;
+    }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            min-height: 100vh;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-        }
+    body {
+        min-height: 100vh;
+        background: #000;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
 
-        .bg-grid {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
-            background-size: 32px 32px;
-            z-index: -1;
-        }
+    .background {
+        position: fixed;
+        inset: 0;
+        background:
+            radial-gradient(circle at 50% 20%, #1a1a1a 0%, transparent 35%),
+            radial-gradient(circle at 20% 80%, #111 0%, transparent 30%),
+            #000;
+        z-index: -1;
+    }
 
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 48px;
-            border-bottom: 1px solid var(--border-color);
-            background: rgba(8, 8, 10, 0.8);
-            backdrop-filter: blur(12px);
-        }
+    .container {
+        width: min(92%, 430px);
+        background: #080808;
+        border: 1px solid #222;
+        border-radius: 20px;
+        padding: 30px 25px;
+        box-shadow:
+            0 0 40px rgba(255,255,255,0.03),
+            0 20px 60px rgba(0,0,0,0.8);
+    }
 
-        .nav-brand {
-            font-weight: 700;
-            font-size: 18px;
-            letter-spacing: 1px;
-        }
+    .logo {
+        width: 65px;
+        height: 65px;
+        margin: 0 auto 18px;
+        border-radius: 18px;
+        background: #000;
+        border: 1px solid #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: 900;
+        letter-spacing: -2px;
+        box-shadow: 0 0 25px rgba(255,255,255,0.04);
+    }
 
-        .accent {
-            color: var(--accent-color);
-        }
+    h1 {
+        text-align: center;
+        font-size: 27px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
 
-        .nav-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            margin-left: 24px;
-            font-size: 14px;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
+    .subtitle {
+        text-align: center;
+        color: #888;
+        font-size: 14px;
+        margin-top: 8px;
+        line-height: 1.5;
+    }
 
-        .nav-links a:hover, .nav-links a.active {
-            color: var(--text-primary);
-        }
+    .key-box {
+        margin-top: 25px;
+        background: #050505;
+        border: 1px solid #222;
+        border-radius: 14px;
+        padding: 15px;
+    }
 
+    .label {
+        color: #777;
+        font-size: 12px;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .key-row {
+        display: flex;
+        gap: 8px;
+    }
+
+    #keyDisplay {
+        flex: 1;
+        min-width: 0;
+        height: 48px;
+        background: #0d0d0d;
+        border: 1px solid #242424;
+        border-radius: 10px;
+        color: #fff;
+        padding: 0 13px;
+        outline: none;
+        font-size: 13px;
+    }
+
+    .copy-btn {
+        width: 75px;
+        border: 1px solid #333;
+        border-radius: 10px;
+        background: #111;
+        color: #fff;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .copy-btn:hover {
+        background: #1c1c1c;
+    }
+
+    .generate-btn {
+        width: 100%;
+        height: 52px;
+        margin-top: 15px;
+        border: 1px solid #333;
+        border-radius: 11px;
+        background: #000;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .generate-btn:hover:not(:disabled) {
+        background: #151515;
+        border-color: #555;
+        transform: translateY(-1px);
+    }
+
+    /* Locked state */
+    .generate-btn:disabled {
+        background: #000;
+        color: #444;
+        border-color: #111;
+        cursor: not-allowed;
+        opacity: 1;
+    }
+
+    .timer {
+        margin-top: 18px;
+        padding: 14px;
+        background: #050505;
+        border: 1px solid #1d1d1d;
+        border-radius: 12px;
+        text-align: center;
+    }
+
+    .timer-title {
+        color: #777;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    #countdown {
+        margin-top: 5px;
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: 1px;
+    }
+
+    .status {
+        text-align: center;
+        font-size: 12px;
+        margin-top: 12px;
+        color: #666;
+    }
+
+    .status.active {
+        color: #aaa;
+    }
+
+    .status.expired {
+        color: #fff;
+    }
+
+    .footer {
+        margin-top: 22px;
+        text-align: center;
+        color: #444;
+        font-size: 11px;
+    }
+
+    @media (max-width: 400px) {
         .container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex: 1;
-            padding: 24px;
+            padding: 25px 18px;
         }
 
-        .glass-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 40px;
-            width: 100%;
-            max-width: 480px;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        h1 {
+            font-size: 24px;
         }
-
-        .panel-header h1 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
-        }
-
-        .system-status {
-            font-size: 11px;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 24px;
-        }
-
-        .status-dot {
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            background: var(--text-secondary);
-        }
-        .status-dot.online {
-            background: #4ade80;
-            box-shadow: 0 0 8px rgba(74, 222, 128, 0.4);
-        }
-
-        .progress-indicator {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 32px;
-            font-size: 11px;
-            color: var(--text-secondary);
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 12px;
-        }
-
-        .progress-indicator .step.active {
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        .progress-indicator .step.completed {
-            color: #4ade80;
-        }
-
-        .description {
-            font-size: 13px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 24px;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 14px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-        }
-
-        .btn-primary {
-            background: var(--accent-color);
-            color: var(--text-primary);
-        }
-
-        .btn-primary:hover {
-            opacity: 0.9;
-            box-shadow: 0 0 16px rgba(229, 57, 53, 0.3);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .key-status-box {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 16px;
-            text-align: center;
-            margin-bottom: 16px;
-        }
-
-        .status-badge {
-            font-size: 12px;
-            font-weight: 600;
-            color: #4ade80;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .countdown-label {
-            font-size: 11px;
-            color: var(--text-secondary);
-        }
-
-        .countdown-timer {
-            font-size: 20px;
-            font-weight: 700;
-            font-family: monospace;
-            margin-top: 4px;
-        }
-
-        .key-display-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .key-display-group input {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 12px;
-            color: var(--text-primary);
-            font-family: monospace;
-            font-size: 12px;
-            text-align: center;
-        }
-
-        .toast-container {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            z-index: 1000;
-        }
-
-        .toast {
-            background: #141418;
-            border: 1px solid var(--border-color);
-            color: #fff;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 12px;
-            animation: slideIn 0.3s ease;
-        }
-
-        .toast.error {
-            border-color: var(--accent-color);
-        }
-
-        @keyframes slideIn {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-    </style>
+    }
+</style>
 </head>
+
 <body>
-    <div class="bg-grid"></div>
 
-    <header class="navbar">
-        <div class="nav-brand">KEN <span class="accent">HUB</span></div>
-        <nav class="nav-links">
-            <a href="#" class="active">System</a>
-            <a href="#" onclick="alert('Ken Hub Secure Key System v2 - Production Ready')">Security</a>
-        </nav>
-    </header>
+<div class="background"></div>
 
-    <main class="container">
-        <div class="glass-card main-panel">
-            <div class="panel-header">
-                <h1>SECURE KEY SYSTEM</h1>
-                <div class="system-status">
-                    <span class="status-dot online"></span> SYSTEM ONLINE
-                    <span class="status-dot online"></span> CONNECTION SECURE
-                </div>
-            </div>
+<main class="container">
 
-            <div class="progress-indicator">
-                <div class="step active" id="stepIndicator1">1. Join</div>
-                <div class="step" id="stepIndicator2">2. Verify</div>
-                <div class="step" id="stepIndicator3">3. Generate</div>
-                <div class="step" id="stepIndicator4">4. Ready</div>
-            </div>
+    <div class="logo">KH</div>
 
-            <div class="action-zone" id="actionZone">
-                <div id="step1View" class="step-view">
-                    <p class="description">Join our official community server to receive authorization credentials.</p>
-                    <button class="btn btn-primary" id="joinDiscordBtn">JOIN DISCORD</button>
-                </div>
+    <h1>Ken Hub</h1>
 
-                <div id="step2View" class="step-view hidden">
-                    <p class="description">Confirm your platform membership to finalize authorization handshake.</p>
-                    <button class="btn btn-primary" id="verifyBtn">VERIFY MEMBERSHIP</button>
-                </div>
+    <p class="subtitle">
+        Generate your 24-hour access key.
+        <br>
+        You can regenerate after the current key expires.
+    </p>
 
-                <div id="step3View" class="step-view hidden">
-                    <p class="description">Your authorization handshake is verified. Generate your temporary 24-hour token.</p>
-                    <button class="btn btn-primary" id="generateKeyBtn">GENERATE 24H KEY</button>
-                </div>
+    <div class="key-box">
 
-                <div id="step4View" class="step-view hidden">
-                    <div class="key-status-box">
-                        <div class="status-badge"><span class="status-dot online"></span> ACTIVE</div>
-                        <div class="countdown-label">Expires in:</div>
-                        <div class="countdown-timer" id="countdownTimer">23:59:59</div>
-                    </div>
-                    <div class="key-display-group">
-                        <input type="text" id="keyValueInput" readonly value="KENHUB-••••••••••••••••-24H">
-                        <button class="btn btn-secondary" id="copyKeyBtn">COPY KEY</button>
-                    </div>
-                </div>
-            </div>
+        <div class="label">Your Key</div>
+
+        <div class="key-row">
+            <input
+                id="keyDisplay"
+                type="text"
+                readonly
+                placeholder="No key generated"
+            >
+
+            <button class="copy-btn" id="copyBtn">
+                Copy
+            </button>
         </div>
-    </main>
 
-    <div class="toast-container" id="toastContainer"></div>
+        <button class="generate-btn" id="generateBtn">
+            Generate 24H Key
+        </button>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            let keyExpirationTimestamp = null;
+    </div>
 
-            const joinDiscordBtn = document.getElementById('joinDiscordBtn');
-            const verifyBtn = document.getElementById('verifyBtn');
-            const generateKeyBtn = document.getElementById('generateKeyBtn');
-            const copyKeyBtn = document.getElementById('copyKeyBtn');
+    <div class="timer">
+        <div class="timer-title">Key expires in</div>
+        <div id="countdown">--:--:--</div>
+    </div>
 
-            const step1View = document.getElementById('step1View');
-            const step2View = document.getElementById('step2View');
-            const step3View = document.getElementById('step3View');
-            const step4View = document.getElementById('step4View');
+    <div class="status" id="status">
+        No active key
+    </div>
 
-            const step1Ind = document.getElementById('stepIndicator1');
-            const step2Ind = document.getElementById('stepIndicator2');
-            const step3Ind = document.getElementById('stepIndicator3');
-            const step4Ind = document.getElementById('stepIndicator4');
+    <div class="footer">
+        Ken Hub • 24 Hour Key System
+    </div>
 
-            function showToast(message, type = 'success') {
-                const container = document.getElementById('toastContainer');
-                const toast = document.createElement('div');
-                toast.className = `toast ${type}`;
-                toast.textContent = message;
-                container.appendChild(toast);
-                setTimeout(() => toast.remove(), 4000);
-            }
+</main>
 
-            joinDiscordBtn.addEventListener('click', () => {
-                joinDiscordBtn.disabled = true;
-                joinDiscordBtn.textContent = 'CONNECTING...';
-                setTimeout(() => {
-                    window.open('https://discord.gg/f8WZ6yJxRD', '_blank');
-                    joinDiscordBtn.disabled = false;
-                    joinDiscordBtn.textContent = 'JOINED — PROCEED';
-                    
-                    step1View.classList.add('hidden');
-                    step2View.classList.remove('hidden');
-                    step1Ind.classList.remove('active');
-                    step1Ind.classList.add('completed');
-                    step2Ind.classList.add('active');
-                }, 1000);
-            });
+<script>
+/* ==========================================
+   KEN HUB 24-HOUR KEY SYSTEM
+   ========================================== */
 
-            verifyBtn.addEventListener('click', async () => {
-                verifyBtn.disabled = true;
-                verifyBtn.textContent = 'VERIFYING...';
-                
-                try {
-                    await new Promise(r => setTimeout(r, 1200));
-                    verifyBtn.disabled = false;
-                    
-                    step2View.classList.add('hidden');
-                    step3View.classList.remove('hidden');
-                    step2Ind.classList.remove('active');
-                    step2Ind.classList.add('completed');
-                    step3Ind.classList.add('active');
-                    showToast('Membership verification successful.');
-                } catch (err) {
-                    verifyBtn.disabled = false;
-                    verifyBtn.textContent = 'VERIFY MEMBERSHIP';
-                    showToast('Verification failed. Try again.', 'error');
-                }
-            });
+const KEY_STORAGE = "kenhub_24h_key";
+const EXPIRY_STORAGE = "kenhub_24h_expiry";
 
-            generateKeyBtn.addEventListener('click', async () => {
-                generateKeyBtn.disabled = true;
-                generateKeyBtn.textContent = 'GENERATING SECURE TOKEN...';
+const generateBtn = document.getElementById("generateBtn");
+const copyBtn = document.getElementById("copyBtn");
+const keyDisplay = document.getElementById("keyDisplay");
+const countdown = document.getElementById("countdown");
+const statusText = document.getElementById("status");
 
-                try {
-                    await new Promise(r => setTimeout(r, 1500));
-                    const randomHex = Array.from(crypto.getRandomValues(new Uint8Array(8)))
-                        .map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
-                    const mockPlaintextKey = `KENHUB-${randomHex}-24H`;
-                    
-                    document.getElementById('keyValueInput').value = mockPlaintextKey;
-                    keyExpirationTimestamp = new Date().getTime() + (24 * 60 * 60 * 1000);
+const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
 
-                    step3View.classList.add('hidden');
-                    step4View.classList.remove('hidden');
-                    step3Ind.classList.remove('active');
-                    step3Ind.classList.add('completed');
-                    step4Ind.classList.add('active');
-                    
-                    startCountdown();
-                    showToast('Key generated securely.');
-                } catch (err) {
-                    generateKeyBtn.disabled = false;
-                    generateKeyBtn.textContent = 'GENERATE 24H KEY';
-                    showToast('Generation failed.', 'error');
-                }
-            });
+let timer = null;
 
-            copyKeyBtn.addEventListener('click', () => {
-                const input = document.getElementById('keyValueInput');
-                navigator.clipboard.writeText(input.value);
-                copyKeyBtn.textContent = 'COPIED!';
-                setTimeout(() => copyKeyBtn.textContent = 'COPY KEY', 2000);
-                showToast('Key copied to clipboard.');
-            });
 
-            function startCountdown() {
-                const timerEl = document.getElementById('countdownTimer');
-                setInterval(() => {
-                    const now = new Date().getTime();
-                    const distance = keyExpirationTimestamp - now;
-                    if (distance < 0) {
-                        timerEl.textContent = 'EXPIRED';
-                        return;
-                    }
-                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                    timerEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-                }, 1000);
-            }
-        });
-    </script>
+/* ------------------------------------------
+   Generate random key
+   ------------------------------------------ */
+
+function generateKey() {
+
+    const characters =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+        "abcdefghijklmnopqrstuvwxyz" +
+        "0123456789";
+
+    let randomPart = "";
+
+    for (let i = 0; i < 20; i++) {
+        randomPart += characters.charAt(
+            Math.floor(Math.random() * characters.length)
+        );
+    }
+
+    return "KENHUB-" + randomPart;
+}
+
+
+/* ------------------------------------------
+   Generate new 24-hour key
+   ------------------------------------------ */
+
+function createKey() {
+
+    const existingExpiry =
+        Number(localStorage.getItem(EXPIRY_STORAGE));
+
+    /*
+        Don't allow regeneration while an existing
+        key is still active.
+    */
+    if (
+        existingExpiry &&
+        Date.now() < existingExpiry
+    ) {
+        return;
+    }
+
+    const key = generateKey();
+    const expiry = Date.now() + TWENTY_FOUR_HOURS;
+
+    localStorage.setItem(KEY_STORAGE, key);
+    localStorage.setItem(EXPIRY_STORAGE, expiry);
+
+    keyDisplay.value = key;
+
+    startTimer(expiry);
+}
+
+
+/* ------------------------------------------
+   Start countdown
+   ------------------------------------------ */
+
+function startTimer(expiry) {
+
+    clearInterval(timer);
+
+    generateBtn.disabled = true;
+
+    statusText.textContent = "Key active — regeneration locked";
+    statusText.className = "status active";
+
+    updateCountdown(expiry);
+
+    timer = setInterval(() => {
+
+        updateCountdown(expiry);
+
+    }, 1000);
+}
+
+
+/* ------------------------------------------
+   Update countdown
+   ------------------------------------------ */
+
+function updateCountdown(expiry) {
+
+    const remaining = expiry - Date.now();
+
+    if (remaining <= 0) {
+
+        clearInterval(timer);
+
+        countdown.textContent = "00:00:00";
+
+        generateBtn.disabled = false;
+
+        statusText.textContent =
+            "Key expired — you can generate a new key";
+
+        statusText.className = "status expired";
+
+        /*
+            Remove expired key.
+        */
+        localStorage.removeItem(KEY_STORAGE);
+        localStorage.removeItem(EXPIRY_STORAGE);
+
+        keyDisplay.value = "";
+
+        return;
+    }
+
+    const totalSeconds =
+        Math.floor(remaining / 1000);
+
+    const hours =
+        Math.floor(totalSeconds / 3600);
+
+    const minutes =
+        Math.floor((totalSeconds % 3600) / 60);
+
+    const seconds =
+        totalSeconds % 60;
+
+    countdown.textContent =
+        String(hours).padStart(2, "0") + ":" +
+        String(minutes).padStart(2, "0") + ":" +
+        String(seconds).padStart(2, "0");
+}
+
+
+/* ------------------------------------------
+   Copy key
+   ------------------------------------------ */
+
+copyBtn.addEventListener("click", async () => {
+
+    const key = keyDisplay.value;
+
+    if (!key) {
+        return;
+    }
+
+    try {
+
+        await navigator.clipboard.writeText(key);
+
+        copyBtn.textContent = "Copied!";
+
+        setTimeout(() => {
+            copyBtn.textContent = "Copy";
+        }, 1500);
+
+    } catch {
+
+        keyDisplay.select();
+        document.execCommand("copy");
+
+        copyBtn.textContent = "Copied!";
+
+        setTimeout(() => {
+            copyBtn.textContent = "Copy";
+        }, 1500);
+    }
+});
+
+
+/* ------------------------------------------
+   Generate button
+   ------------------------------------------ */
+
+generateBtn.addEventListener("click", () => {
+
+    if (generateBtn.disabled) {
+        return;
+    }
+
+    createKey();
+});
+
+
+/* ------------------------------------------
+   Restore key after page refresh
+   ------------------------------------------ */
+
+function restoreKey() {
+
+    const savedKey =
+        localStorage.getItem(KEY_STORAGE);
+
+    const savedExpiry =
+        Number(localStorage.getItem(EXPIRY_STORAGE));
+
+    if (
+        savedKey &&
+        savedExpiry &&
+        Date.now() < savedExpiry
+    ) {
+
+        keyDisplay.value = savedKey;
+
+        startTimer(savedExpiry);
+
+        return;
+    }
+
+    /*
+        No active key or previous key expired.
+    */
+
+    localStorage.removeItem(KEY_STORAGE);
+    localStorage.removeItem(EXPIRY_STORAGE);
+
+    generateBtn.disabled = false;
+
+    countdown.textContent = "00:00:00";
+
+    statusText.textContent =
+        "No active key";
+
+    statusText.className = "status";
+}
+
+
+/* ------------------------------------------
+   Start system
+   ------------------------------------------ */
+
+restoreKey();
+
+</script>
+
 </body>
-        </html>
-
+    </html>
