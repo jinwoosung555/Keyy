@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ken Hub — Secure Key System</title>
+    <style>
+        :root {
+            --bg-color: #08080a;
+            --card-bg: rgba(14, 14, 18, 0.85);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --accent-color: #e53935;
+            --text-primary: #ffffff;
+            --text-secondary: #9e9ea6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 32px 32px;
+            z-index: -1;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 48px;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(8, 8, 10, 0.8);
+            backdrop-filter: blur(12px);
+        }
+
+        .nav-brand {
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: 1px;
+        }
+
+        .accent {
+            color: var(--accent-color);
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-left: 24px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--text-primary);
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+            padding: 24px;
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 480px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .panel-header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .system-status {
+            font-size: 11px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .status-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+        }
+        .status-dot.online {
+            background: #4ade80;
+            box-shadow: 0 0 8px rgba(74, 222, 128, 0.4);
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .progress-indicator .step.active {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .progress-indicator .step.completed {
+            color: #4ade80;
+        }
+
+        .description {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: var(--text-primary);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            box-shadow: 0 0 16px rgba(229, 57, 53, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .key-status-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .status-badge {
+            font-size: 12px;
+            font-weight: 600;
+            color: #4ade80;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .countdown-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .countdown-timer {
+            font-size: 20px;
+            font-weight: 700;
+            font-family: monospace;
+            margin-top: 4px;
+        }
+
+        .key-display-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .key-display-group input {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            color: var(--text-primary);
+            font-family: monospace;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 1000;
+        }
+
+        .toast {
+            background: #141418;
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 12px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.error {
+            border-color: var(--accent-color);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+
+    <header class="navbar">
+        <div class="nav-brand">KEN <span class="accent">HUB</span></div>
+        <nav class="nav-links">
+            <a href="#" class="active">System</a>
+            <a href="#" onclick="alert('Ken Hub Secure Key System v2 - Production Ready')">Security</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="glass-card main-panel">
+            <div class="panel-header">
+                <h1>SECURE KEY SYSTEM</h1>
+                <div class="system-status">
+                    <span class="status-dot online"></span> SYSTEM ONLINE
+                    <span class="status-dot online"></span> CONNECTION SECURE
+                </div>
+            </div>
+
+            <div class="progress-indicator">
+                <div class="step active" id="stepIndicator1">1. Join</div>
+                <div class="step" id="stepIndicator2">2. Verify</div>
+                <div class="step" id="stepIndicator3">3. Generate</div>
+                <div class="step" id="stepIndicator4">4. Ready</div>
+            </div>
+
+            <div style="font-size:11px;color:#777;margin-bottom:14px;text-align:center;">24H keys are generated locally. Regeneration stays locked in this browser until expiry.</div>
+            <div class="action-zone" id="actionZone">
+                <div id="step1View" class="step-view">
+                    <p class="description">Join our official community server to receive authorization credentials.</p>
+                    <button class="btn btn-primary" id="joinDiscordBtn">JOIN DISCORD</button>
+                </div>
+
+                <div id="step2View" class="step-view hidden">
+                    <p class="description">Confirm your platform membership to finalize authorization handshake.</p>
+                    <button class="btn btn-primary" id="verifyBtn">VERIFY MEMBERSHIP</button>
+                </div>
+
+                <div id="step3View" class="step-view hidden">
+                    <p class="description">Your authorization handshake is verified. Generate your temporary 24-hour token.</p>
+                    <button class="btn btn-primary" id="generateKeyBtn">GENERATE 24H KEY</button>
+                </div>
+
+                <div id="step4View" class="step-view hidden">
+                    <div class="key-status-box">
+                        <div class="status-badge"><span class="status-dot online"></span> ACTIVE</div>
+                        <div class="countdown-label">Expires in:</div>
+                        <div class="countdown-timer" id="countdownTimer">23:59:59</div>
+                    </div>
+                    <div class="key-display-group">
+                        <input type="text" id="keyValueInput" readonly value="KENHUB-••••••••••••••••-24H">
+                        <button class="btn btn-secondary" id="copyKeyBtn">COPY KEY</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const KEY_SALT = 'KENHUB_V2_24H_2026';
+            const KEY_DISCORD = 'https://discord.gg/xcT4nU4VHx';
+            const STORAGE_KEY = 'kenhub_24h_key_v2';
+            const joinDiscordBtn = document.getElementById('joinDiscordBtn');
+            const verifyBtn = document.getElementById('verifyBtn');
+            const generateKeyBtn = document.getElementById('generateKeyBtn');
+            const copyKeyBtn = document.getElementById('copyKeyBtn');
+            const step1View = document.getElementById('step1View');
+            const step2View = document.getElementById('step2View');
+            const step3View = document.getElementById('step3View');
+            const step4View = document.getElementById('step4View');
+            const step1Ind = document.getElementById('stepIndicator1');
+            const step2Ind = document.getElementById('stepIndicator2');
+            const step3Ind = document.getElementById('stepIndicator3');
+            const step4Ind = document.getElementById('stepIndicator4');
+            let countdownInterval = null;
+            function showToast(message,type='success'){const c=document.getElementById('toastContainer');const t=document.createElement('div');t.className=`toast ${type}`;t.textContent=message;c.appendChild(t);setTimeout(()=>t.remove(),4000);}
+            function hash32(text){let h=2166136261;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h>>>0;}
+            function hashHex(text){return hash32(text).toString(16).padStart(8,'0').toUpperCase();}
+            function makeKey(hour){return `KENHUB-${Math.floor(hour).toString(36).toUpperCase()}-${hashHex(`${KEY_SALT}:${hour}`)}-24H`;}
+            function getStoredKey(){try{const d=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');if(!d||!d.key||!d.expires)return null;if(Date.now()>=Number(d.expires)){localStorage.removeItem(STORAGE_KEY);return null;}return d;}catch(_){return null;}}
+            function showStep(n){[step1View,step2View,step3View,step4View].forEach(v=>v.classList.add('hidden'));[step1Ind,step2Ind,step3Ind,step4Ind].forEach(v=>v.classList.remove('active','completed'));const v=[step1View,step2View,step3View,step4View],i=[step1Ind,step2Ind,step3Ind,step4Ind];v[n-1].classList.remove('hidden');for(let x=0;x<n-1;x++)i[x].classList.add('completed');i[n-1].classList.add('active');}
+            function updateCountdown(expires){const el=document.getElementById('countdownTimer');let d=expires-Date.now();if(d<=0){el.textContent='EXPIRED';if(countdownInterval)clearInterval(countdownInterval);localStorage.removeItem(STORAGE_KEY);return;}const h=Math.floor(d/3600000),m=Math.floor((d%3600000)/60000),s=Math.floor((d%60000)/1000);el.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;}
+            function showExisting(d){document.getElementById('keyValueInput').value=d.key;generateKeyBtn.disabled=true;generateKeyBtn.textContent='KEY LOCKED';generateKeyBtn.style.background='#000';generateKeyBtn.style.color='#fff';generateKeyBtn.style.cursor='not-allowed';showStep(4);updateCountdown(d.expires);countdownInterval=setInterval(()=>updateCountdown(d.expires),1000);}
+            joinDiscordBtn.addEventListener('click',()=>{window.open(KEY_DISCORD,'_blank');joinDiscordBtn.textContent='JOINED — PROCEED';showStep(2);});
+            verifyBtn.addEventListener('click',()=>{verifyBtn.disabled=true;verifyBtn.textContent='VERIFYING...';setTimeout(()=>{verifyBtn.disabled=false;verifyBtn.textContent='VERIFIED — CONTINUE';showStep(3);showToast('Ready to generate your 24-hour key.');},500);});
+            generateKeyBtn.addEventListener('click',()=>{const old=getStoredKey();if(old){showExisting(old);return;}generateKeyBtn.disabled=true;generateKeyBtn.textContent='GENERATING...';setTimeout(()=>{const hour=Math.floor(Date.now()/3600000),expires=(hour+24)*3600000,key=makeKey(hour);localStorage.setItem(STORAGE_KEY,JSON.stringify({key,expires,issuedHour:hour}));document.getElementById('keyValueInput').value=key;generateKeyBtn.textContent='KEY LOCKED';generateKeyBtn.style.background='#000';generateKeyBtn.style.color='#fff';generateKeyBtn.style.cursor='not-allowed';showStep(4);updateCountdown(expires);countdownInterval=setInterval(()=>updateCountdown(expires),1000);showToast('24-hour key generated. Regeneration is locked until expiry.');},600);});
+            copyKeyBtn.addEventListener('click',async()=>{const input=document.getElementById('keyValueInput');try{await navigator.clipboard.writeText(input.value);}catch(_){input.select();document.execCommand('copy');}copyKeyBtn.textContent='COPIED!';setTimeout(()=>copyKeyBtn.textContent='COPY KEY',2000);showToast('Key copied to clipboard.');});
+            const old=getStoredKey();if(old)showExisting(old);
+        });
+    </script>
+</body>
+        </html>
+
